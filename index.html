@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlgoVerse — Interactive 3D Algorithm Visualizer</title>
+  <meta name="description" content="Visualize sorting algorithms, binary search, and graph traversals in immersive 3D space with tactile depth and step-by-step intuition.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%237C3AED'/><text x='16' y='21' font-size='16' font-family='sans-serif' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Sticky Navigation Bar
+       ========================================================================== -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-container">
+      <!-- Brand & 3D Tilt Logo -->
+      <a href="#home" class="nav-brand" aria-label="AlgoVerse Home">
+        <div class="brand-logo-badge" title="AlgoVerse - Interactive 3D Algorithm Visualizer">
+          <svg class="brand-logo-svg" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="badgeGrad" cx="30%" cy="25%" r="75%">
+                <stop offset="0%" stop-color="#FFFFFF" />
+                <stop offset="70%" stop-color="#FAF9FF" />
+                <stop offset="100%" stop-color="#EDE9FE" />
+              </radialGradient>
+              <linearGradient id="lineGrad" x1="12" y1="12" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#7C3AED" />
+                <stop offset="50%" stop-color="#A855F7" />
+                <stop offset="100%" stop-color="#EC4899" />
+              </linearGradient>
+              <linearGradient id="nodeGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#8B5CF6" />
+                <stop offset="100%" stop-color="#6D28D9" />
+              </linearGradient>
+              <filter id="badgeShadow" x="-10%" y="-10%" width="130%" height="130%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#7C3AED" flood-opacity="0.22" />
+              </filter>
+            </defs>
+
+            <!-- 3D Beveled Circular Badge -->
+            <circle cx="28" cy="28" r="25" fill="url(#badgeGrad)" stroke="#C4B5FD" stroke-width="1.2" filter="url(#badgeShadow)" />
+            <circle cx="28" cy="28" r="23" stroke="rgba(124, 58, 237, 0.12)" stroke-width="0.8" />
+
+            <!-- Interconnected Traversal Lines subtly forming an 'A' -->
+            <line x1="28" y1="12" x2="17" y2="40" stroke="url(#lineGrad)" stroke-width="2.2" stroke-linecap="round" />
+            <line x1="28" y1="12" x2="39" y2="40" stroke="url(#lineGrad)" stroke-width="2.2" stroke-linecap="round" />
+            <line x1="21" y1="28" x2="35" y2="28" stroke="url(#lineGrad)" stroke-width="2.2" stroke-linecap="round" />
+
+            <!-- Geometric Interlocking Nodes -->
+            <circle cx="28" cy="12" r="4.2" fill="url(#nodeGrad)" stroke="#FFFFFF" stroke-width="1.8" />
+            <circle cx="21" cy="28" r="3.4" fill="#7C3AED" stroke="#FFFFFF" stroke-width="1.5" />
+            <circle cx="35" cy="28" r="3.4" fill="#7C3AED" stroke="#FFFFFF" stroke-width="1.5" />
+            <circle cx="17" cy="40" r="3.8" fill="url(#nodeGrad)" stroke="#FFFFFF" stroke-width="1.5" />
+            <circle cx="39" cy="40" r="3.8" fill="url(#nodeGrad)" stroke="#FFFFFF" stroke-width="1.5" />
+            <circle cx="28" cy="28" r="2.2" fill="#EC4899" />
+          </svg>
+        </div>
+        <span class="brand-wordmark">AlgoVerse<span class="brand-dot">.</span></span>
+      </a>
+
+      <!-- Smooth Scroll Navigation Links -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="#home" class="nav-link">Home</a></li>
+          <li><a href="#visualizer" class="nav-link">Visualizer</a></li>
+          <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="#complexity" class="nav-link">Complexity</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <!-- Audio FX Synthesizer Toggle -->
+        <button data-audio-toggle id="btn-audio-toggle" class="audio-toggle-btn active" title="Audio FX On — click to mute" aria-label="Toggle Sound Effects" aria-pressed="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <!-- GitHub Source Button -->
+        <a href="https://github.com/Sahajreddy07" target="_blank" rel="noopener noreferrer" class="btn-github" title="View Source on GitHub" aria-label="View Source on GitHub">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>View Source on GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Hero Section with 3D Constellation & Rotating Polyhedra Background
+       ========================================================================== -->
+  <section class="hero" id="home">
+    <div class="hero-canvas-container">
+      <canvas id="hero-canvas"></canvas>
+    </div>
+
+    <div class="container hero-content">
+      <div class="hero-pill">
+        <span class="hero-pill-dot"></span>
+        <span>Spatial Dimension for Computational Logic</span>
+      </div>
+
+      <h1 class="hero-title">
+        Visualize Algorithms in <span class="text-gradient">3D</span>.<br>Understand Instantly.
+      </h1>
+
+      <p class="hero-description">
+        Experience sorting algorithms, binary search, and graph traversals with tactile 3D depth, orbit camera controls, and step-by-step spatial intuition.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#visualizer" id="hero-cta-btn" class="btn-primary">
+          <span>Start Visualizing</span>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <a href="#how-it-works" class="btn-secondary">
+          <span>Explore How It Works</span>
+        </a>
+      </div>
+
+      <div class="hero-features">
+        <div class="hero-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <span>3D Extruded Arrays</span>
+        </div>
+        <div class="hero-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
+          <span>Interactive 360° Orbit</span>
+        </div>
+        <div class="hero-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Live Queue & Stack Tracing</span>
+        </div>
+        <div class="hero-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <span>Acoustic Web Audio Feedback</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Visualizer Workspace Section
+       ========================================================================== -->
+  <section class="section-visualizer" id="visualizer">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-glow section-tag">Interactive Workspace</div>
+        <h2 class="section-title">Step-by-Step 3D Simulation</h2>
+        <p class="section-subtitle">
+          Rotate the canvas, slow down execution, inspect individual nodes, and compare 2D vs 3D perspectives.
+        </p>
+      </div>
+
+      <!-- Algorithm Selector Tabs -->
+      <div class="algo-selector-wrapper">
+        <div class="algo-tabs" role="tablist">
+          <button class="algo-tab-btn active" data-algo="bubble" role="tab" aria-selected="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+              <line x1="12" y1="20" x2="12" y2="8"></line>
+            </svg>
+            <span>Bubble Sort</span>
+          </button>
+
+          <button class="algo-tab-btn" data-algo="merge" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 3v12"></path>
+              <circle cx="18" cy="6" r="3"></circle>
+              <circle cx="6" cy="18" r="3"></circle>
+              <path d="M18 9a9 9 0 0 1-9 9"></path>
+            </svg>
+            <span>Merge Sort</span>
+          </button>
+
+          <button class="algo-tab-btn" data-algo="binary_search" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Binary Search</span>
+          </button>
+
+          <button class="algo-tab-btn" data-algo="bfs" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="2"></circle>
+              <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path>
+            </svg>
+            <span>BFS (Breadth-First)</span>
+          </button>
+
+          <button class="algo-tab-btn" data-algo="dfs" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="2" x2="12" y2="22"></line>
+              <polyline points="19 15 12 22 5 15"></polyline>
+            </svg>
+            <span>DFS (Depth-First)</span>
+          </button>
+        </div>
+
+        <!-- Description Banner of selected algorithm -->
+        <div class="algo-desc-banner" id="algo-desc-banner">
+          <strong>Bubble Sort:</strong> Iteratively compares adjacent pairs and swaps them if disordered, bubbling larger values to the end.
+        </div>
+      </div>
+
+      <!-- 3D Visualization Card -->
+      <div class="visualizer-card">
+        <!-- Canvas Header Bar -->
+        <div class="canvas-header">
+          <div class="canvas-title-group">
+            <span class="canvas-algo-name" id="canvas-algo-title">Bubble Sort</span>
+            <span class="algo-status-badge status-ready" id="algo-status-badge">Ready</span>
+          </div>
+
+          <div class="canvas-header-actions">
+            <!-- 2D / 3D Toggle Switch -->
+            <div class="view-mode-toggle" title="Switch 2D / 3D camera projection">
+              <button class="view-mode-btn" id="view-mode-2d">2D</button>
+              <button class="view-mode-btn active" id="view-mode-3d">3D</button>
+            </div>
+
+            <!-- Orbit Reset Button -->
+            <button class="icon-btn" id="btn-reset-orbit" title="Reset Camera Orbit Angle" aria-label="Reset Camera View">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6"></path>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+            </button>
+
+            <!-- Custom Data Modal Trigger -->
+            <button class="icon-btn" id="btn-custom-data" title="Provide Custom Dataset" aria-label="Customize Dataset">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Three.js 3D Viewport -->
+        <div class="canvas-viewport-container">
+          <canvas id="algo-canvas"></canvas>
+
+          <!-- Interactive Click & Hover Tooltip -->
+          <div class="canvas-tooltip" id="canvas-tooltip">
+            <span class="tooltip-title">Element</span>
+            <span class="tooltip-val">Value</span>
+            <span class="tooltip-desc">Click to inspect</span>
+          </div>
+
+          <!-- Camera Navigation Hint -->
+          <div class="canvas-hint">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            <span>Left-drag to Orbit • Scroll to Zoom • Right-drag to Pan</span>
+          </div>
+
+          <!-- Graph Queue / Stack HUD (Visible for BFS & DFS) -->
+          <aside class="graph-hud-panel hidden" id="graph-hud-panel" aria-label="Traversal Data Structure">
+            <div class="hud-header">
+              <span class="hud-title" id="hud-title">Live Queue</span>
+              <span class="hud-count" id="hud-count">0 items</span>
+            </div>
+            <div class="hud-items-list" id="hud-items-list">
+              <!-- Dynamically populated queue/stack items -->
+            </div>
+          </aside>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="controls-bar">
+          <!-- Playback Group -->
+          <div class="controls-left">
+            <div class="playback-controls">
+              <!-- Reset Button -->
+              <button class="btn-playback" id="btn-reset" title="Reset (R)" aria-label="Reset">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 4v6h6"></path>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+              </button>
+
+              <!-- Step Backward -->
+              <button class="btn-playback" id="btn-step-back" title="Step Backward (Left Arrow)" aria-label="Step Backward">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="19 20 9 12 19 4 19 20"></polygon>
+                  <line x1="5" y1="19" x2="5" y2="5"></line>
+                </svg>
+              </button>
+
+              <!-- Main Play / Pause -->
+              <button class="btn-playback btn-playback-main" id="btn-play" title="Play (Space)" aria-label="Play or Pause">
+                <svg viewBox="0 0 24 24">
+                  <polygon points="6 4 20 12 6 20 6 4" fill="currentColor"></polygon>
+                </svg>
+              </button>
+
+              <!-- Step Forward -->
+              <button class="btn-playback" id="btn-step-forward" title="Step Forward (Right Arrow)" aria-label="Step Forward">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                  <line x1="19" y1="5" x2="19" y2="19"></line>
+                </svg>
+              </button>
+
+              <!-- Mute / Unmute Toggle Button (Speaker Icon 🔊/🔇) -->
+              <button class="btn-playback btn-mute-toggle" id="btn-controls-mute" data-audio-toggle title="Mute/Unmute Audio (M)" aria-label="Mute or Unmute Sound">
+                <span class="speaker-icon" id="controls-speaker-icon" aria-hidden="true">🔊</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Speed Slider & Configuration -->
+          <div class="controls-center">
+            <div class="control-slider-group">
+              <label for="speed-slider">Speed:</label>
+              <input type="range" id="speed-slider" class="custom-range" min="0.2" max="3.0" step="0.1" value="1.0">
+              <span class="speed-value-badge" id="speed-badge">1.0x</span>
+            </div>
+
+            <!-- Binary Search Target Value Input -->
+            <div class="search-target-group" id="search-target-group">
+              <label for="search-target-input">Target:</label>
+              <input type="number" id="search-target-input" class="search-target-input" value="42" min="1" max="100">
+            </div>
+          </div>
+
+          <!-- Shuffle / Randomize Action -->
+          <div class="controls-right">
+            <button class="btn-action-pill" id="btn-shuffle" title="Generate New Random Data">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"></polyline>
+                <line x1="4" y1="20" x2="21" y2="3"></line>
+                <polyline points="21 16 21 21 16 21"></polyline>
+                <line x1="15" y1="15" x2="21" y2="21"></line>
+                <line x1="4" y1="4" x2="9" y2="9"></line>
+              </svg>
+              <span>Randomize Data</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Realtime Explanation & Metrics Panel -->
+      <div class="metrics-narration-grid">
+        <!-- Live Narration & Pseudocode Tracker -->
+        <div class="panel-card narration-panel">
+          <div class="narration-header">
+            <h3 class="narration-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Live Execution Narration</span>
+            </h3>
+            <span class="badge">Synchronized</span>
+          </div>
+
+          <div class="narration-box">
+            <p class="narration-text" id="narration-text">
+              Press Play or Step Forward to begin the 3D visual traversal.
+            </p>
+          </div>
+
+          <!-- Synchronized Pseudocode Window -->
+          <div class="pseudocode-wrapper">
+            <div class="pseudocode-title">Active Pseudocode Line</div>
+            <pre class="pseudocode-block"><code id="pseudocode-lines"></code></pre>
+          </div>
+        </div>
+
+        <!-- Live Metrics & Complexity Card -->
+        <div class="panel-card metrics-panel">
+          <div class="metrics-row">
+            <div class="metric-stat-box">
+              <div class="metric-label">Comparisons</div>
+              <div class="metric-value" id="metric-comparisons">0</div>
+            </div>
+            <div class="metric-stat-box">
+              <div class="metric-label">Swaps / Visits</div>
+              <div class="metric-value" id="metric-swaps">0</div>
+            </div>
+          </div>
+
+          <div class="metric-stat-box" style="margin-top: -8px;">
+            <div class="metric-label">Total Operations</div>
+            <div class="metric-value" id="metric-operations">0</div>
+          </div>
+
+          <!-- Time & Space Complexity Badges -->
+          <div class="complexity-section">
+            <div class="complexity-header">
+              <span class="complexity-title">Complexity Profile</span>
+              <button class="info-tooltip-btn" id="btn-info-modal" title="Detailed Algorithm Explanation">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div class="complexity-grid">
+              <div class="complexity-item">
+                <span class="complexity-item-label">Best Case Time</span>
+                <span class="complexity-item-val" id="comp-time-best">O(n)</span>
+              </div>
+              <div class="complexity-item">
+                <span class="complexity-item-label">Average Case Time</span>
+                <span class="complexity-item-val" id="comp-time-avg">O(n²)</span>
+              </div>
+              <div class="complexity-item">
+                <span class="complexity-item-label">Worst Case Time</span>
+                <span class="complexity-item-val" id="comp-time-worst">O(n²)</span>
+              </div>
+              <div class="complexity-item">
+                <span class="complexity-item-label">Space Complexity</span>
+                <span class="complexity-item-val" id="comp-space">O(1)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       How It Works Section
+       ========================================================================== -->
+  <section class="section-how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-glow section-tag">Visual Semantics</div>
+        <h2 class="section-title">How 3D Transforms Comprehension</h2>
+        <p class="section-subtitle">
+          Every spatial coordinate, illumination shift, and color change conveys precise algorithmic semantics.
+        </p>
+      </div>
+
+      <div class="how-cards-grid">
+        <!-- Card 1: Comparisons -->
+        <div class="how-card">
+          <div class="how-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          </div>
+          <h3 class="how-card-title">Comparisons</h3>
+          <p class="how-card-desc">
+            Bars glow with an intense deep purple beam when evaluated. Dual point lights cast high-contrast shadows to spotlight the exact decision threshold.
+          </p>
+        </div>
+
+        <!-- Card 2: Swaps & Moves -->
+        <div class="how-card">
+          <div class="how-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </div>
+          <h3 class="how-card-title">Swaps & Transitions</h3>
+          <p class="how-card-desc">
+            Elements smoothly glide through 3D space with cubic ease-out arcs, glowing with radiant pink-violet pulses to visually confirm index exchanges.
+          </p>
+        </div>
+
+        <!-- Card 3: Window Narrowing -->
+        <div class="how-card">
+          <div class="how-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </div>
+          <h3 class="how-card-title">Pointer Bounds</h3>
+          <p class="how-card-desc">
+            Binary Search renders floating 3D pointer cones for LOW, MID, and HIGH, while discarded search intervals fade out into translucent monochrome.
+          </p>
+        </div>
+
+        <!-- Card 4: Graph Horizons -->
+        <div class="how-card">
+          <div class="how-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/></svg>
+          </div>
+          <h3 class="how-card-title">Graph Horizons</h3>
+          <p class="how-card-desc">
+            Witness BFS ripple outward like an acoustic wave front (FIFO Queue) versus DFS plunging deep into branch pathways (LIFO Stack) with live side tracking.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Complexity Matrix Comparison Section
+       ========================================================================== -->
+  <section class="section-complexity-table" id="complexity">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-glow section-tag">Reference Guide</div>
+        <h2 class="section-title">Algorithm Comparison Matrix</h2>
+        <p class="section-subtitle">
+          Side-by-side performance benchmarks, asymptotic complexity, and memory requirements.
+        </p>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="complexity-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Type</th>
+              <th>Best Case</th>
+              <th>Average Case</th>
+              <th>Worst Case</th>
+              <th>Auxiliary Space</th>
+              <th>Stability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="table-algo-name">Bubble Sort</td>
+              <td>Comparison Sort</td>
+              <td><span class="complexity-chip complexity-good">O(n)</span></td>
+              <td><span class="complexity-chip complexity-bad">O(n²)</span></td>
+              <td><span class="complexity-chip complexity-bad">O(n²)</span></td>
+              <td><span class="complexity-chip complexity-good">O(1)</span></td>
+              <td>Stable</td>
+            </tr>
+            <tr>
+              <td class="table-algo-name">Merge Sort</td>
+              <td>Divide & Conquer</td>
+              <td><span class="complexity-chip complexity-fair">O(n log n)</span></td>
+              <td><span class="complexity-chip complexity-fair">O(n log n)</span></td>
+              <td><span class="complexity-chip complexity-fair">O(n log n)</span></td>
+              <td><span class="complexity-chip complexity-fair">O(n)</span></td>
+              <td>Stable</td>
+            </tr>
+            <tr>
+              <td class="table-algo-name">Binary Search</td>
+              <td>Divide & Conquer</td>
+              <td><span class="complexity-chip complexity-good">O(1)</span></td>
+              <td><span class="complexity-chip complexity-good">O(log n)</span></td>
+              <td><span class="complexity-chip complexity-good">O(log n)</span></td>
+              <td><span class="complexity-chip complexity-good">O(1)</span></td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td class="table-algo-name">BFS</td>
+              <td>Graph Traversal</td>
+              <td><span class="complexity-chip complexity-good">O(V + E)</span></td>
+              <td><span class="complexity-chip complexity-good">O(V + E)</span></td>
+              <td><span class="complexity-chip complexity-good">O(V + E)</span></td>
+              <td><span class="complexity-chip complexity-fair">O(V)</span></td>
+              <td>Shortest Path (Unweighted)</td>
+            </tr>
+            <tr>
+              <td class="table-algo-name">DFS</td>
+              <td>Graph Traversal</td>
+              <td><span class="complexity-chip complexity-good">O(V + E)</span></td>
+              <td><span class="complexity-chip complexity-good">O(V + E)</span></td>
+              <td><span class="complexity-chip complexity-good">O(V + E)</span></td>
+              <td><span class="complexity-chip complexity-fair">O(V)</span></td>
+              <td>Branch / Backtrack</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       About Section
+       ========================================================================== -->
+  <section class="section-about" id="about">
+    <div class="container">
+
+      <!-- Creator Card -->
+      <div class="creator-card">
+        <div class="creator-avatar" aria-hidden="true">
+          <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="avatarGrad" cx="35%" cy="30%" r="80%">
+                <stop offset="0%" stop-color="#A78BFA"/>
+                <stop offset="100%" stop-color="#6D28D9"/>
+              </radialGradient>
+            </defs>
+            <circle cx="28" cy="28" r="26" fill="url(#avatarGrad)"/>
+            <text x="28" y="34" font-family="sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">SR</text>
+          </svg>
+        </div>
+        <div class="creator-info">
+          <div class="badge badge-glow" style="margin-bottom: 12px;">Creator</div>
+          <h2 class="creator-name">P. Sahaj Reddy</h2>
+          <p class="creator-bio">
+            AlgoVerse was built by <strong>P. Sahaj Reddy</strong>, a passionate developer focused on making algorithms visual, intuitive, and fun to learn. Sahaj believes that the best way to truly understand how a computer thinks is to <em>see</em> it think — in three dimensions, with sound, and at your own pace.
+          </p>
+          <div class="creator-links">
+            <a href="mailto:sahajporeddy@gmail.com" class="creator-link-pill" aria-label="Email Sahaj">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              sahajporeddy@gmail.com
+            </a>
+            <a href="https://github.com/Sahajreddy07" target="_blank" rel="noopener noreferrer" class="creator-link-pill" aria-label="GitHub Profile">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              Sahajreddy07
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-grid" style="margin-top: 64px;">
+        <div>
+          <div class="badge badge-glow section-tag">Philosophy & Architecture</div>
+          <h2 class="section-title">Built for Intuitive Mastery</h2>
+          <p class="hero-description" style="margin-left: 0; margin-bottom: 24px;">
+            Algorithms are usually taught on static chalkboards or flat 2D diagrams that fail to convey spatial relationships and state transitions. AlgoVerse re-imagines computational thinking through WebGL 3D depth, harmonic audio synthesis, and fine-grained timeline scrubbing.
+          </p>
+          <div class="about-highlight-box">
+            <div class="about-highlight-title">Zero Heavy Dependencies</div>
+            <div class="about-highlight-desc">
+              Engineered with clean vanilla JavaScript, Web Audio API, and Three.js for optimal 60 FPS rendering and minimal memory overhead.
+            </div>
+          </div>
+          <div class="about-highlight-box">
+            <div class="about-highlight-title">Modular Algorithm Engines</div>
+            <div class="about-highlight-desc">
+              Each algorithm is completely isolated with its own step generator, state snapshots, and mathematical complexity definitions.
+            </div>
+          </div>
+        </div>
+
+        <div class="about-card-visual">
+          <div class="badge" style="margin-bottom: 16px;">System Highlights</div>
+          <h3 class="font-display" style="font-size: 1.5rem; margin-bottom: 12px; color: var(--text-primary);">
+            Sensory-Rich Computer Science
+          </h3>
+          <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+            When students hear frequency shifts as array elements are sorted, and watch 3D markers physically travel through cubes and graph nodes, abstract algorithmic concepts become unforgettable.
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <span class="badge">Web Audio API</span>
+            <span class="badge">Three.js WebGL</span>
+            <span class="badge">Full 360° Orbit</span>
+            <span class="badge">Keyboard Accessible</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Footer
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-logo-wrap">
+        <div class="brand-logo-badge" style="width: 36px; height: 36px;">
+          <svg class="brand-logo-svg" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="25" fill="#FAF9FF" stroke="#C4B5FD" stroke-width="1.2" />
+            <line x1="28" y1="12" x2="17" y2="40" stroke="#7C3AED" stroke-width="2" />
+            <line x1="28" y1="12" x2="39" y2="40" stroke="#7C3AED" stroke-width="2" />
+            <line x1="21" y1="28" x2="35" y2="28" stroke="#7C3AED" stroke-width="2" />
+            <circle cx="28" cy="12" r="3.5" fill="#7C3AED" />
+            <circle cx="17" cy="40" r="3.5" fill="#7C3AED" />
+            <circle cx="39" cy="40" r="3.5" fill="#7C3AED" />
+          </svg>
+        </div>
+        <span class="brand-wordmark" style="font-size: 1.25rem;">AlgoVerse<span class="brand-dot">.</span></span>
+      </div>
+
+      <p class="footer-tagline">
+        Illuminating computation through spatial dimensions, tactile physics, and sound.
+      </p>
+
+      <!-- Connect with me — Profile Block -->
+      <div class="footer-profile-block">
+        <p class="footer-connect-label">Connect with me</p>
+        <p class="footer-creator-name">P. Sahaj Reddy</p>
+        <div class="footer-social-links">
+
+          <!-- Email -->
+          <a href="mailto:sahajporeddy@gmail.com" class="social-icon-btn" title="Email: sahajporeddy@gmail.com" aria-label="Send Email to Sahaj">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+          </a>
+
+          <!-- X (Twitter) -->
+          <a href="https://x.com/sahaj1415" target="_blank" rel="noopener noreferrer" class="social-icon-btn" title="X / Twitter @sahaj1415" aria-label="X (Twitter) profile">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+
+          <!-- LinkedIn -->
+          <a href="https://www.linkedin.com/in/sahaj-reddy-83a43b371" target="_blank" rel="noopener noreferrer" class="social-icon-btn" title="LinkedIn — Sahaj Reddy" aria-label="LinkedIn profile">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+          </a>
+
+          <!-- GitHub -->
+          <a href="https://github.com/Sahajreddy07" target="_blank" rel="noopener noreferrer" class="social-icon-btn" title="GitHub — Sahajreddy07" aria-label="GitHub profile">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 P. Sahaj Reddy — AlgoVerse. All rights reserved.</span>
+        <button class="back-to-top-btn" id="btn-back-to-top">
+          <span>Back to top</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       Modal: Custom Data Input
+       ========================================================================== -->
+  <div class="modal-backdrop" id="custom-data-modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modal-close-btn" aria-label="Close Modal">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <h3 class="modal-title" id="custom-modal-title">Custom Dataset</h3>
+      <p class="modal-subtitle">Enter comma-separated numbers (1 to 100) to test custom corner cases.</p>
+      
+      <div class="custom-input-group">
+        <label class="custom-input-label" for="custom-array-input">Array Values (4 to 24 numbers):</label>
+        <textarea id="custom-array-input" class="custom-textarea" placeholder="e.g. 84, 12, 45, 93, 27, 65, 38, 19, 77, 50"></textarea>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn-secondary" onclick="document.getElementById('custom-data-modal').classList.remove('open')">Cancel</button>
+        <button class="btn-primary" id="btn-apply-custom" style="padding: 10px 24px; font-size: 0.95rem;">Apply Dataset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Modal: Algorithm Deep Dive Explanation
+       ========================================================================== -->
+  <div class="modal-backdrop" id="algo-info-modal" role="dialog" aria-modal="true" aria-labelledby="info-modal-title">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="info-modal-close" aria-label="Close Modal">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <h3 class="modal-title" id="info-modal-title">Algorithm Deep Dive</h3>
+      <div class="modal-body" id="info-modal-body">
+        <!-- Dynamically injected -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Script Includes (Local Offline Vendor with CDN Fallback)
+       ========================================================================== -->
+  <script src="vendor/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+  <script src="vendor/OrbitControls.js"></script>
+  <script>
+    if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+    }
+  </script>
+
+  <!-- Audio Synthesizer -->
+  <script src="js/sound.js"></script>
+
+  <!-- Algorithm Engines -->
+  <script src="js/algorithms/bubbleSort.js"></script>
+  <script src="js/algorithms/mergeSort.js"></script>
+  <script src="js/algorithms/binarySearch.js"></script>
+  <script src="js/algorithms/bfs.js"></script>
+  <script src="js/algorithms/dfs.js"></script>
+
+  <!-- 3D Views & Controllers -->
+  <script src="js/hero3d.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
